@@ -130,12 +130,11 @@
     "Run CMD on BODY.
   If CMD succeeds then return its results, otherwise display
   STDERR with `org-babel-eval-error-notify'."
-    (let ((ttl-file (org-babel-temp-file "ob-ttl-"))
+    (let ((ttl-file (org-babel-temp-file "ob-ttl-" ".ttl"))
 	  (output-file (org-babel-temp-file "ob-ttl-out-")))
       (with-temp-file ttl-file (insert body))
-      (async-start-process (executable-find "fuseki-server") (concat "--mem --file " ttl-file " /ob-ttl") nil)
+      (async-start-process "apache-jena-fuseki" (executable-find "fuseki-server") nil "--file" ttl-file "/ob-ttl")
 	))
-
 
   ;; This function should be used to assign any variables in params in
   ;; the context of the session environment.
