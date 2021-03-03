@@ -18,9 +18,20 @@
   #+end_src
 
 
-  #+begin_src sparql
-
+  #+begin_src sparql :url http://localhost:3030/ob-ttl
+    SELECT *
+    WHERE {
+      ?s ?p ?o.
+    }
   #+end_src
+
+  #+RESULTS:
+  | s                                       | p                                     | o                                      |
+  |-----------------------------------------+---------------------------------------+----------------------------------------|
+  | _:b0                                    | http://example.org/stuff/1.0/homePage | http://purl.org/net/dajobe/            |
+  | _:b0                                    | http://example.org/stuff/1.0/fullname | Dave Beckett                           |
+  | http://www.w3.org/TR/rdf-syntax-grammar | http://example.org/stuff/1.0/editor   | _:b0                                   |
+  | http://www.w3.org/TR/rdf-syntax-grammar | http://purl.org/dc/elements/1.1/title | RDF/TTL Syntax Specification (Revised) |
 
 
 * Code
