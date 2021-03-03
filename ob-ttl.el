@@ -1,0 +1,135 @@
+;;; ob-ttl.el --- org-babel functions for ttl evaluation
+
+;; Copyright (C) Dr. Ian FitzPatrick
+
+;; Author: Dr. Ian FitzPatrick
+;; Keywords: literate programming, reproducible research
+;; Homepage: https://orgmode.org
+;; Version: 0.01
+
+;;; License:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+;;
+;; process ttl documents with ttl from org babel
+;;
+
+;;; Requirements:
+
+;; ttlproc
+
+;;; Code:
+(require 'ob)
+(require 'ob-ref)
+(require 'ob-comint)
+(require 'ob-eval)
+(require 's)
+
+;; possibly require modes required for your language
+(define-derived-mode ttl-mode "ttl"
+  "Major mode for editing ttl files."
+  )
+
+
+
+;; optionally define a file extension for this language
+(add-to-list 'org-babel-tangle-lang-exts '("ttl" . "ttl"))
+
+;; optionally declare default header arguments for this language
+(defvar org-babel-default-header-args:ttl '()) ; TODO use this for input in stead of variable
+
+;; This function expands the body of a source code block by doing
+;; things like prepending argument definitions to the body, it should
+;; be called by the `org-babel-execute:ttl' function below.
+(defun org-babel-expand-body:ttl (body params &optional processed-params)
+  "Expand BODY according to PARAMS, return the expanded body."
+					;(require 'inf-ttl) : TODO check if needed
+  body ; TODO translate params to ttl variables
+  )
+
+;; This is the main function which is called to evaluate a code
+;; block.
+;;
+;; This function will evaluate the body of the source code and
+;; return the results as emacs-lisp depending on the value of the
+;; :results header argument
+;; - output means that the output to STDOUT will be captured and
+;;   returned
+;; - value means that the value of the last statement in the
+;;   source code block will be returned
+;;
+;; The most common first step in this function is the expansion of the
+;; PARAMS argument using `org-babel-process-params'.
+;;
+;; Please feel free to not implement options which aren't appropriate
+;; for your language (e.g. not all languages support interactive
+;; "session" evaluation).  Also you are free to define any new header
+;; arguments which you feel may be useful -- all header arguments
+;; specified by the user will be available in the PARAMS variable.
+(defun org-babel-execute:ttl (body params)
+  "Execute a block of ttl code with org-babel.
+This function is called by `org-babel-execute-src-block'"
+  (message "executing ttl source code block")
+  (let*
+      ((ttl (or (cdr (cdr (assoc :var params) ) ) ""))
+
+       (ttl (s-replace-regexp "^#\+.*\n" "" ttl))) ; remove orgmode markup from input
+
+    (org-babel-eval-ttl body ttl)
+    ;; when forming a shell command, or a fragment of code in some
+    ;; other language, please preprocess any file names involved with
+    ;; the function `org-babel-process-file-name'. (See the way that
+    ;; function is used in the language files)
+    ))
+					;
+
+(defun org-babel-eval-ttl (body ttl)
+  "Run CMD on BODY.
+If CMD succeeds then return its results, otherwise display
+STDERR with `org-babel-eval-error-notify'."
+  (let ((ttl-file (org-babel-temp-file "ob-ttl-"))
+	(output-file (org-babel-temp-file "ob-ttl-out-")))
+    (with-temp-file ttl-file (insert body))
+    (async-start-process (executable-find "fuseki-server") (concat "--mem --file " ttl-file " /ob-ttl") nil)
+      ))
+
+
+;; This function should be used to assign any variables in params in
+;; the context of the session environment.
+(defun org-babel-prep-session:ttl (session params)
+  "Prepare SESSION according to the header arguments specified in PARAMS."
+  )
+
+(defun org-babel-ttl-var-to-ttl (var)
+  "Convert an elisp var into a string of ttl source code
+specifying a var of the same value."
+  (format "%S" var))
+
+(defun org-babel-ttl-table-or-string (results)
+  "If the results look like a table, then convert them into an
+Emacs-lisp table, otherwise return the results as a string."
+  )
+
+(defun org-babel-ttl-initiate-session (&optional session)
+  "If there is not a current inferior-process-buffer in SESSION then create.
+Return the initialized session."
+  (unless (string= session "none")
+    ))
+
+(provide 'ob-ttl)
+;;; ob-ttl.el ends here
