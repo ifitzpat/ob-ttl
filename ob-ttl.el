@@ -47,8 +47,7 @@
 
 
 
-;; ;; o
-ptionally define a file extension for this language
+;; ;; optionally define a file extension for this language
 (add-to-list 'org-babel-tangle-lang-exts '("ttl" . "ttl"))
 
 ;; optionally declare default header arguments for this language
